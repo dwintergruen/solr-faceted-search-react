@@ -8,30 +8,65 @@ const getFacetValues = (type, results, field, lowerBound, upperBound) =>
 	type === "period-range-facet" ? (results.facets[lowerBound] || []).concat(results.facets[upperBound] || []) :
 		type === "list-facet" || type === "range-facet" ? results.facets[field] || [] : null;
 
+//const getPivotFacetValues = (type, results, field, lowerBound, upperBound) =>
+//		type === "pivot-facet" ? results.facets["facet_pivot"][field] || [] : null;
+
+function getPivotFacetValues (type, results, field, lowerBound, upperBound) {
+    console.log(results);
+    var pivotFields = results.pivotFacets[field];
+    return pivotFields || []
+
+}
+
+const getHighlightValues = (type, results, field) =>
+	type === "text-highlight" ? getHighlightValuesForField(results,field): null;
+
+
+function getHighlightValuesForField(results,field) {
+	var highlights = [];
+	for (var key in results["highlighting"]) {
+		highlights.push({
+            key: key,
+            value: results["highlighting"]["key"][field]
+        });
+	}
+	return highlights;
+}
+
 
 class SolrFacetedSearch extends React.Component {
 
 	render() {
-		const { customComponents, bootstrapCss, query, results, truncateFacetListsAt } = this.props;
+		const { customComponents, bootstrapCss, query, results, truncateFacetListsAt,diva_url} = this.props;
 		const { onSearchFieldChange, onSortFieldChange, onPageChange, onCsvExport } = this.props;
 
 		const { searchFields, sortFields, start, rows } = query;
-
 
 		const SearchFieldContainerComponent = customComponents.searchFields.container;
 		const ResultContainerComponent = customComponents.results.container;
 
 		const ResultComponent = customComponents.results.result;
+		const GroupResultComponent = customComponents.results.groupresult;
 		const ResultCount = customComponents.results.resultCount;
 		const ResultHeaderComponent = customComponents.results.header;
 		const ResultListComponent = customComponents.results.list;
 		const ResultPendingComponent = customComponents.results.pending;
 		const PaginateComponent = customComponents.results.paginate;
+		const GroupPaginateComponent = customComponents.results.grouppaginate;
 		const PreloadComponent = customComponents.results.preloadIndicator;
 		const CsvExportComponent = customComponents.results.csvExport;
 		const CurrentQueryComponent = customComponents.searchFields.currentQuery;
 		const SortComponent = customComponents.sortFields.menu;
 		const resultPending = results.pending ? (<ResultPendingComponent bootstrapCss={bootstrapCss} />) : null;
+        var grouped = results.pending ? null : results.grouped["source_i"] ;
+
+
+        if (grouped === null || typeof (grouped) === "undefined") {
+            grouped = [];
+        } else {
+        	grouped = grouped.groups;
+		}
+
 
 		const pagination = query.pageStrategy === "paginate" ?
 			<PaginateComponent {...this.props} bootstrapCss={bootstrapCss} onChange={onPageChange} /> :
@@ -43,15 +78,16 @@ class SolrFacetedSearch extends React.Component {
 		return (
 			<div className={cx("solr-faceted-search", {"container": bootstrapCss, "col-md-12": bootstrapCss})}>
 				<SearchFieldContainerComponent bootstrapCss={bootstrapCss} onNewSearch={this.props.onNewSearch}>
-					{searchFields.map((searchField, i) => {
+					{searchFields.filter(function (searchField) {return !searchField.exact}).map((searchField, i) => {
 						const { type, field, lowerBound, upperBound } = searchField;
 						const SearchComponent = customComponents.searchFields[type];
 						const facets = getFacetValues(type, results, field, lowerBound, upperBound);
-
+						const pivotFacets = getPivotFacetValues(type, results, field, lowerBound, upperBound);
 						return (<SearchComponent
 							key={i} {...this.props} {...searchField}
 							bootstrapCss={bootstrapCss}
 							facets={facets}
+							pivotFacets={pivotFacets}
 							truncateFacetListsAt={truncateFacetListsAt}
 							onChange={onSearchFieldChange} />
 						);
@@ -69,20 +105,26 @@ class SolrFacetedSearch extends React.Component {
 					</ResultHeaderComponent>
 					<CurrentQueryComponent {...this.props} onChange={onSearchFieldChange} />
 					{pagination}
-					<ResultListComponent bootstrapCss={bootstrapCss}>
+						<ResultListComponent bootstrapCss={bootstrapCss}>
 						{results.docs.map((doc, i) => (
 							<ResultComponent bootstrapCss={bootstrapCss}
-								doc={doc}
-								fields={searchFields}
-								key={doc.id || i}
-								onSelect={this.props.onSelectDoc}
-								resultIndex={i}
-								rows={rows}
-								start={start}
+											 highlighting={results.highlighting}
+											doc={doc}
+											fields={searchFields}
+											key={doc.id || i}
+											onSelect={this.props.onSelectDoc}
+											resultIndex={i}
+											rows={rows}
+											start={start}
+											 diva_url={diva_url}
+
 							/>
+
 						))}
-						{preloadListItem}
+					{preloadListItem}
 					</ResultListComponent>
+
+
 					{pagination}
 				</ResultContainerComponent>
 			</div>
@@ -92,6 +134,7 @@ class SolrFacetedSearch extends React.Component {
 
 SolrFacetedSearch.defaultProps = {
 	bootstrapCss: true,
+	diva_url: "",
 	customComponents: componentPack,
 	pageStrategy: "paginate",
 	rows: 20,
@@ -119,3 +162,23 @@ SolrFacetedSearch.propTypes = {
 };
 
 export default SolrFacetedSearch;
+
+
+/*{	<ResultListComponent bootstrapCss={bootstrapCss}>
+						{results.docs.map((doc, i) => (
+							<ResultComponent bootstrapCss={bootstrapCss}
+											 highlighting={results.highlighting}
+											doc={doc}
+											fields={searchFields}
+											key={doc.id || i}
+											onSelect={this.props.onSelectDoc}
+											resultIndex={i}
+											rows={rows}
+											start={start}
+											 diva_url={diva_url}
+
+
+							/>
+						))}
+					{preloadListItem}
+					</ResultListComponent> */

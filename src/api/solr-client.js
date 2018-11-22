@@ -12,10 +12,12 @@ class SolrClient {
 		delete settings.onChange;
 
 		this.state = {
+			diva_url:settings.diva_url,
 			query: settings,
 			results: {
 				facets: [],
 				docs: [],
+				pivotFacets:[],
 				numFound: 0
 			}
 		};

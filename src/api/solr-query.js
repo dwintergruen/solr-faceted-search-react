@@ -21,13 +21,22 @@ const periodRangeFacetToQueryFilter = (field) => {
 };
 
 const listFacetFieldToQueryFilter = (field) => {
-	const filters = field.value || [];
-	if (filters.length === 0) {
-		return null;
-	}
+    const filters = field.value || [];
+    if (filters.length === 0) {
+        return null;
+    }
 
 	const filterQ = filters.map((f) => `"${f}"`).join(" OR ");
 	return encodeURIComponent(`${field.field}:(${filterQ})`);
+};
+
+const pivotFieldToQueryFilter = (field) => {
+	if(!field.value || field.value.length === 0) {
+		return null;
+	}
+
+	//return encodeURIComponent(field.field === "*" ? field.value : `${field.field}:${field.value}`);
+	return field.field === "*" ? field.value : `${field.field}:${field.value}`;
 };
 
 const textFieldToQueryFilter = (field) => {
@@ -35,26 +44,67 @@ const textFieldToQueryFilter = (field) => {
 		return null;
 	}
 
-	return encodeURIComponent(field.field === "*" ? field.value : `${field.field}:${field.value}`);
+	//return encodeURIComponent(field.field === "*" ? field.value : `${field.field}:${field.value}`);
+
+	if (field.exact) {
+		return field.field === "*" ? field.value : `${field.field}:"${field.value}"`;
+	} else {
+        return field.field === "*" ? field.value : `${field.field}:${field.value}`;
+    }
 };
+
+const exactTextFieldToQueryFilter = (field) => {
+	if(!field.value || field.value.length === 0) {
+		return null;
+	}
+
+	//return encodeURIComponent(field.field === "*" ? field.value : `${field.field}:${field.value}`);
+	return field.field === "*" ? encodeURIComponent(field.value) : `${field.field}:"${encodeURIComponent(field.value)}"`;
+};
+
 
 const fieldToQueryFilter = (field) => {
 	if (field.type === "text") {
 		return textFieldToQueryFilter(field);
 	} else if (field.type === "list-facet") {
 		return listFacetFieldToQueryFilter(field);
+	} else if (field.type === "pivot-facet") {
+		return pivotFieldToQueryFilter(field);
 	} else if (field.type === "range-facet" || field.type === "range") {
 		return rangeFacetToQueryFilter(field);
 	} else if (field.type === "period-range-facet" || field.type === "period-range") {
 		return periodRangeFacetToQueryFilter(field);
+	} else if (field.type === "text-highlight") {
+		return textFieldToQueryFilter(field);
 	}
 	return null;
 };
 
-const buildQuery = (fields) => fields
+const fieldToHighlightQueryFilter = (field) => {
+	if (field.type === "text-highlight") {
+		return textFieldToQueryFilter(field);
+	}
+	return null;
+};
+
+const buildQuery_fq = (fields) => fields
 	.map(fieldToQueryFilter)
 	.filter((queryFilter) => queryFilter !== null)
 	.map((queryFilter) => `fq=${queryFilter}`)
+	.join("&");
+
+
+
+const buildQuery = (fields) => fields
+	.map(fieldToQueryFilter)
+	.filter((queryFilter) => queryFilter !== null)
+	.map((queryFilter) => `${queryFilter}`)
+	.join(" AND ");
+
+const buildHighlightQuery = (fields) => fields
+	.map(fieldToHighlightQueryFilter)
+	.filter((queryFilter) => queryFilter !== null)
+	.map((queryFilter) => `hl.q=${queryFilter}`)
 	.join("&");
 
 const facetFields = (fields) => fields
@@ -65,6 +115,11 @@ const facetFields = (fields) => fields
 			.filter((field) => field.type === "period-range-facet")
 			.map((field) => `facet.field=${encodeURIComponent(field.lowerBound)}&facet.field=${encodeURIComponent(field.upperBound)}`)
 	)
+	.join("&");
+
+const pivotFields = (fields) => fields
+	.filter((field) => field.type === "pivot-facet" )
+	.map((field) => `facet.pivot=${field.field}`)
 	.join("&");
 
 const facetSorts = (fields) => fields
@@ -96,9 +151,10 @@ const solrQuery = (query, format = {wt: "json"}) => {
 		} = query;
 
 	const filters = (query.filters || []).map((filter) => ({...filter, type: filter.type || "text"}));
-	const queryParams = buildQuery(searchFields.concat(filters));
-
+	const queryParams = "q=" + (buildQuery(searchFields.concat(filters)) || "*:*");
+	const highlightParam = buildHighlightQuery(searchFields.concat(filters));
 	const facetFieldParam = facetFields(searchFields);
+	const pivotFieldParam = pivotFields(searchFields);
 	const facetSortParams = facetSorts(searchFields);
 	const facetLimitParam = `facet.limit=${facetLimit || -1}`;
 	const facetSortParam = `facet.sort=${facetSort || "index"}`;
@@ -107,10 +163,11 @@ const solrQuery = (query, format = {wt: "json"}) => {
 	const idSort = pageStrategy === "cursor" ? [{field: idField, value: "asc"}] : [];
 
 	const sortParam = buildSort(sortFields.concat(idSort));
-	const groupParam = group && group.field ? `group=on&group.field=${encodeURIComponent(group.field)}` : "";
+	//const groupParam = group && group.field ? `group=on&group.field=${encodeURIComponent(group.field)}` : "";
+	const groupParam ="";
 
-
-	return `q=*:*&${queryParams.length > 0 ? queryParams : ""}` +
+	console.log("queryParams",queryParams)
+	var qs =`${queryParams.length > 0 ? queryParams : ""}` +
 		`${sortParam.length > 0 ? `&sort=${sortParam}` : ""}` +
 		`${facetFieldParam.length > 0 ? `&${facetFieldParam}` : ""}` +
 		`${facetSortParams.length > 0 ? `&${facetSortParams}` : ""}` +
@@ -118,10 +175,14 @@ const solrQuery = (query, format = {wt: "json"}) => {
 		`&rows=${rows}` +
 		`&${facetLimitParam}` +
 		`&${facetSortParam}` +
+		`&${pivotFieldParam}` +
 		`&${cursorMarkParam}` +
 		(start === null ? "" : `&start=${start}`) +
-		"&facet=on" +
+		"&facet=on&hl=on&hl.fl=text&hl.snippets=10&hl.fragsize=300&hl.defaultSummary=true&fq=-django_ct:documents.page" +
+		//`&${highlightParam}` +
 		`&${buildFormat(format)}`;
+	console.log("qs",qs);
+	return qs
 };
 
 export default solrQuery;
@@ -132,10 +193,12 @@ export {
 	periodRangeFacetToQueryFilter,
 	listFacetFieldToQueryFilter,
 	textFieldToQueryFilter,
+	exactTextFieldToQueryFilter,
 	fieldToQueryFilter,
 	buildQuery,
 	facetFields,
 	facetSorts,
 	buildSort,
+	pivotFieldToQueryFilter,
 	solrQuery
 };
