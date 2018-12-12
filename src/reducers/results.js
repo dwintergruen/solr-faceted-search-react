@@ -25,8 +25,8 @@ export default function(state=initialState, action) {
 				docs: action.data.response ? action.data.response.docs : [],
 				grouped: action.data.grouped || {},
 				numFound: action.data.response ? action.data.response.numFound : tryGroupedResultCount(action.data),
-				facets: action.data.facet_counts.facet_fields,
-				pivotFacets: action.data.facet_counts.facet_pivot,
+				facets: action.data.facet_counts ?  action.data.facet_counts.facet_fields : [],
+				pivotFacets: action.data.facet_counts ? action.data.facet_counts.facet_pivot : [],
 				highlighting: action.data.highlighting,
 				pending: false
 			};

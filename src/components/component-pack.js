@@ -14,7 +14,7 @@ import GroupResult from "./results/groupresult";
 import CsvExport from "./results/csv-export";
 import SearchFieldContainer from "./search-field-container";
 import RangeFacet from "./range-facet";
-
+import Show from "./show";
 import CountLabel from "./results/count-label";
 import SortMenu from "./sort-menu";
 import CurrentQuery from "./current-query";
@@ -27,6 +27,7 @@ export default {
 		"pivot-facet": PivotFacet,
 		"range-facet": RangeFacet,
 		"period-range-facet": RangeFacet,
+		"show":Show,
 		container: SearchFieldContainer,
 		currentQuery: CurrentQuery
 	},

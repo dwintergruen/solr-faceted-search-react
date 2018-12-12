@@ -33,12 +33,20 @@ function pivotTypeToFields(fields) {
 const fields = [
 	{label: "All text fields", field: "*", type: "text"},
     {label: "Text", field: "text", type: "text-highlight"},
+	{label: "Archiv", field: "md_akten_bestand_archiv_bezeichnung_txts_s", type: "show"},
+	{label: "Abteilung", field: "md_akten_bestand_abteilung_bezeichnung_txts_s", type: "show"},
+	{label: "Bestand", field: "md_akten_bestand_bezeichnung_txts_s", type: "show"},
+	{label: "Laufzeit Start", field: "md_akten_laufzeit_start_txts_l", type: "range-facet"},
+	{label: "Laufzeit End", field: "md_akten_laufzeit_end_txts_l", type: "range-facet"},
 	{label: "Archiv", field: "md_akten_bestand_archiv_bezeichnung_txts_s,md_akten_bestand_abteilung_bezeichnung_txts_s,md_akten_bestand_bezeichnung_txts_s", type: "pivot-facet"},
 	{label: "Signatur", field: "md_akten_bestand_archiv_signatur_txts_s,md_akten_bestand_abteilung_signatur_txts_s,md_akten_bestand_signatur_txts_s", type: "pivot-facet"},
-	{label: "Url", field: "url_part1,url_part2,url_part3", type: "pivot-facet"},
+	{label: "Path", field: "path_1,path_2,path_3,path_4,path_5,path_6,path_7", type: "pivot-facet"},
 	{label: "Barcode", field: "barcode", type: "text"},
-	{label: "Id", field: "id", type: "text"},
+	{label: "Id", field: "id", type: "text", exact: true},
+	{label: "Akten ID", field: "md_akten_id_is", type: "text",link:"http://gmpg-intern.mpiwg-berlin.mpg.de:8888/admin/Archiv/akte/"},
+	{label: "Url", field: "url", type: "show"},
 	{label: "Type", field: "django_ct", type: "list-facet"},
+
 
 	//{label: "Date of birth", field: "birthDate_i", type: "range-facet"},
 	//{label: "Date of death", field: "deathDate_i", type: "range-facet"}
@@ -58,8 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	var sc = new SolrClient({
 		// The solr index url to be queried by the client
-		url: "http://localhost:8889/ds/solr/",
-		diva_url: "http://localhost:8889/",
+		url: "/ds/solr/",
+		//url:"http://localhost:8889/ds/solr/",
+		//diva_url: "http://localhost:8889/",
+		diva_url:"/",
 		searchFields: pivotTypeToFields(fields),
 		sortFields: sortFields,
         rows: 10,
@@ -73,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 					{...state}
 					{...handlers}
 					bootstrapCss={true}
-					diva_url = "http://localhost:8889/"
+					diva_url = "/"
 					onSelectDoc={(doc) => console.log(doc)}
 				/>,
 				document.getElementById("app")

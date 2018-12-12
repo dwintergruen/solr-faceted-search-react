@@ -136,6 +136,12 @@ const buildFormat = (format) => Object.keys(format)
 	.map((key) => `${key}=${encodeURIComponent(format[key])}`)
 	.join("&");
 
+const searchFieldsAsList = (fields) => fields
+	.filter((field) => field.type === "text" || field.type === "show")
+	.filter((field) => !(field.field ==="*"))
+	.map((field) => field.field)
+	.join(",")
+
 const solrQuery = (query, format = {wt: "json"}) => {
 	const {
 			searchFields,
@@ -157,6 +163,7 @@ const solrQuery = (query, format = {wt: "json"}) => {
 	const pivotFieldParam = pivotFields(searchFields);
 	const facetSortParams = facetSorts(searchFields);
 	const facetLimitParam = `facet.limit=${facetLimit || -1}`;
+	const fields = searchFieldsAsList(searchFields);
 	const facetSortParam = `facet.sort=${facetSort || "index"}`;
 
 	const cursorMarkParam = pageStrategy === "cursor" ? `cursorMark=${encodeURIComponent(cursorMark || "*")}` : "";
@@ -177,8 +184,9 @@ const solrQuery = (query, format = {wt: "json"}) => {
 		`&${facetSortParam}` +
 		`&${pivotFieldParam}` +
 		`&${cursorMarkParam}` +
+		`&fl=${fields}` +
 		(start === null ? "" : `&start=${start}`) +
-		"&facet=on&hl=on&hl.fl=text&hl.snippets=10&hl.fragsize=300&hl.defaultSummary=true&fq=-django_ct:documents.page" +
+		"&facet=on&hl=on&hl.fl=text&hl.snippets=10&hl.fragsize=300&hl.defaultSummary=true&fq=+django_ct:*&fq=-django_ct:documents.page&fq=-django_ct:documents.pdfpage" +
 		//`&${highlightParam}` +
 		`&${buildFormat(format)}`;
 	console.log("qs",qs);

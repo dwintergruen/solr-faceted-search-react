@@ -89,7 +89,8 @@ class SolrFacetedSearch extends React.Component {
 							facets={facets}
 							pivotFacets={pivotFacets}
 							truncateFacetListsAt={truncateFacetListsAt}
-							onChange={onSearchFieldChange} />
+							onChange={onSearchFieldChange}
+							/>
 						);
 					})}
 				</SearchFieldContainerComponent>
