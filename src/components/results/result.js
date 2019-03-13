@@ -16,7 +16,7 @@ class Result extends React.Component {
 
 		if (typeof highlighting == "undefined") {return ""};
 
-		var ret = "<ul>";
+		var ret = "<ul class ='highlight-list'>";
 		const value = highlighting[doc["id"]][field] || null; //.filter((v) => v !== null);
 
 		for (var v in value){
@@ -28,19 +28,21 @@ class Result extends React.Component {
 
 	}
 	render() {
-		const { bootstrapCss, doc, fields, highlighting, diva_url } = this.props;
+		const { bootstrapCss, doc, fields, highlighting, diva_url, search_text } = this.props;
 
 		var thumb_url = diva_url + 'docs/thumb/' + doc.id;
-		var simple_link = diva_url + 'docs/simplePDFSource/' + doc.id;
+		var st = search_text || '';
+		var simple_link = diva_url + 'docs/simplePDFSource/' + doc.id + "?search=" + st;
 		var diva_link = diva_url + 'diva/diva/' + doc.id;
 		return (
 			<ul>
+
 
 			<li className={cx({"list-group-item": bootstrapCss})}><img src={thumb_url}/><img src={thumb_url + '?pn=2'}/><img src={thumb_url + '?pn=3'}/></li>
 
 			<li className={cx({"list-group-item": bootstrapCss})} onClick={() => this.props.onSelect(doc)}>
 				<ul>
-					{fields.filter((field) => field.field !== "*" && field.type !== "text-highlight" && !field.exact && field.type != "pivot-facet").map((field, i) =>
+					{fields.filter((field) => field.field !== "*" && field.type !== "text-highlight" && !field.exact && field.type != "pivot-facet" && field.type != "list-facet" && field.type != "range-facet").map((field, i) =>
 						<li key={i}>
 							<label>{field.label || field.field}</label>
                             {!field.link ? (this.renderValue(field.field, doc)) :
@@ -50,7 +52,7 @@ class Result extends React.Component {
 					)}
 					{fields.filter((field) => field.field !== "*" && field.type === "text-highlight").map((field, i) =>
 						<li key={i}>
-							<label>{field.label || field.field}</label>
+							<label><a href={ diva_url + 'docs/simplePDFSource/' + doc.id + "?search=" + field.value}>{field.label || field.field}</a></label>
 							<div dangerouslySetInnerHTML={{__html: this.renderHighLightValue(field.field, doc, highlighting)}}/>
 						</li>
 					)}
@@ -67,7 +69,8 @@ Result.propTypes = {
 	bootstrapCss: PropTypes.bool,
 	doc: PropTypes.object,
 	fields: PropTypes.array,
-	onSelect: PropTypes.func.isRequired
+	onSelect: PropTypes.func.isRequired,
+	search_text: PropTypes.string
 };
 
 export default Result;

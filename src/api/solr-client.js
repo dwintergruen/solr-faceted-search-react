@@ -1,7 +1,10 @@
 import queryReducer from "../reducers/query";
 import resultReducer from "../reducers/results";
+import externQueryReducer from "../reducers/externQuery";
 // import { submitQuery, fetchCsv } from "./server";
 import server from "./server";
+import queryString from 'query-string';
+//import { withRouter } from 'react-router';
 
 
 class SolrClient {
@@ -13,6 +16,7 @@ class SolrClient {
 
 		this.state = {
 			diva_url:settings.diva_url,
+			last_search_url:settings.last_search_url,
 			query: settings,
 			results: {
 				facets: [],
@@ -34,6 +38,8 @@ class SolrClient {
 
 	setInitialQuery(queryToMerge) {
 
+
+
 		const searchFieldsToMerge = queryToMerge.searchFields || [];
 		const sortFieldsToMerge = queryToMerge.sortFields || [];
 
@@ -49,6 +55,9 @@ class SolrClient {
 	}
 
 	initialize() {
+		//alert(this.props);
+		//var params = queryString.parse(this.props.location.search)
+		//alert(params);
 		const { query } = this.state;
 		const { pageStrategy } = query;
 		const payload = {type: "SET_QUERY_FIELDS",
@@ -69,11 +78,40 @@ class SolrClient {
 		this.sendQuery(queryReducer(this.state.query, payload));
 	}
 
+
+
+
+
+	sendLastQuery(){
+		var qr = { url : this.state.last_search_url +  "/last",
+			     data : ""}
+		server.submitGeneralQuery(qr, (action) => {
+			this.state.results = resultReducer(this.state.results, action);
+			//this.state.query = queryReducer(this.state.query, action);
+			this.onChange(this.state, this.getHandlers());
+			}
+		)
+		this.sendLastFieldValuesQuery();
+		}
+
+	sendLastFieldValuesQuery(){
+		var qr = { url : this.state.last_search_url +  "/lastFieldValues",
+			     data : ""}
+		server.submitGeneralQuery(qr, (action) => {
+			//this.state.results = resultReducer(this.state.results, action);
+			this.state.query = externQueryReducer(this.state.query, action);
+			this.onChange(this.state, this.getHandlers());
+			}
+		)
+		}
+
+
 	sendQuery(query = this.state.query) {
 		delete query.cursorMark;
 		this.state.query = query;
 		server.submitQuery(query, (action) => {
 			this.state.results = resultReducer(this.state.results, action);
+
 			this.state.query = queryReducer(this.state.query, action);
 			this.onChange(this.state, this.getHandlers());
 		});
@@ -175,11 +213,17 @@ class SolrClient {
 			onSetCollapse: this.setCollapse.bind(this),
 			onNewSearch: this.resetSearchFields.bind(this),
 			onCsvExport: this.fetchCsv.bind(this),
+			onGetLastSearch: this.sendLastQuery.bind(this),
 			onGroupChange: this.setGroup.bind(this)
 		};
 	}
 }
 
+//const SolrClient = withRouter(SolrClientTMP);
+//export default withRouter(SolrClient);
 export {
-	SolrClient
-};
+    SolrClient
+}
+;
+
+

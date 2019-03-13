@@ -1,5 +1,5 @@
 {
-  "homepage":"/static/GMPG_search2/build/",
+  "homepage": "/static/GMPG_search2/build/",
   "name": "gmpg-search",
   "version": "0.1.0",
   "private": true,
@@ -29,6 +29,8 @@
     "prop-types": "^15.6.1",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
+    "react-router": "^4.3.1",
+    "react-router-dom": "0.0.0",
     "react-scripts": "^2.0.5",
     "sinon": "^1.17.6",
     "watchify": "^3.7.0",

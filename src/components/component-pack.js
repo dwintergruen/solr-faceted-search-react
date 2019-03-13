@@ -12,6 +12,7 @@ import GroupResultPagination from "./results/grouppagination";
 import PreloadIndicator from "./results/preload-indicator";
 import GroupResult from "./results/groupresult";
 import CsvExport from "./results/csv-export";
+import LastSearch from "./searches/last-search";
 import SearchFieldContainer from "./search-field-container";
 import RangeFacet from "./range-facet";
 import Show from "./show";
@@ -43,6 +44,9 @@ export default {
 		csvExport: CsvExport,
 		paginate: ResultPagination,
 		grouppaginate: GroupResultPagination
+	},
+	searches: {
+		lastSearch: LastSearch
 	},
 	sortFields: {
 		menu: SortMenu

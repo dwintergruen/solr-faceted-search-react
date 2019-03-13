@@ -34,11 +34,22 @@ function getHighlightValuesForField(results,field) {
 }
 
 
+function getText(searchFields) {
+	var text = ""
+	for (var key in searchFields) {
+		if (searchFields[key]["type"] == "text-highlight") {
+			text = text + searchFields[key]["value"] + " "
+		}
+	}
+	return text;
+}
+
+
 class SolrFacetedSearch extends React.Component {
 
 	render() {
 		const { customComponents, bootstrapCss, query, results, truncateFacetListsAt,diva_url} = this.props;
-		const { onSearchFieldChange, onSortFieldChange, onPageChange, onCsvExport } = this.props;
+		const { onSearchFieldChange, onSortFieldChange, onPageChange, onCsvExport, onGetLastSearch } = this.props;
 
 		const { searchFields, sortFields, start, rows } = query;
 
@@ -55,6 +66,7 @@ class SolrFacetedSearch extends React.Component {
 		const GroupPaginateComponent = customComponents.results.grouppaginate;
 		const PreloadComponent = customComponents.results.preloadIndicator;
 		const CsvExportComponent = customComponents.results.csvExport;
+		const LastSearchComponent = customComponents.searches.lastSearch;
 		const CurrentQueryComponent = customComponents.searchFields.currentQuery;
 		const SortComponent = customComponents.sortFields.menu;
 		const resultPending = results.pending ? (<ResultPendingComponent bootstrapCss={bootstrapCss} />) : null;
@@ -75,6 +87,7 @@ class SolrFacetedSearch extends React.Component {
 		const preloadListItem = query.pageStrategy === "cursor" && results.docs.length < results.numFound ?
 			<PreloadComponent {...this.props} /> : null;
 
+		var search_text = getText(searchFields);
 		return (
 			<div className={cx("solr-faceted-search", {"container": bootstrapCss, "col-md-12": bootstrapCss})}>
 				<SearchFieldContainerComponent bootstrapCss={bootstrapCss} onNewSearch={this.props.onNewSearch}>
@@ -103,6 +116,7 @@ class SolrFacetedSearch extends React.Component {
 						{this.props.showCsvExport
 							? <CsvExportComponent bootstrapCss={bootstrapCss} onClick={onCsvExport} />
 							: null}
+							<LastSearchComponent bootstrapCss={bootstrapCss} onClick={onGetLastSearch} />
 					</ResultHeaderComponent>
 					<CurrentQueryComponent {...this.props} onChange={onSearchFieldChange} />
 					{pagination}
@@ -118,6 +132,7 @@ class SolrFacetedSearch extends React.Component {
 											rows={rows}
 											start={start}
 											 diva_url={diva_url}
+											 search_text={search_text}
 
 							/>
 

@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import SolrFacetedSearch from "./components/solr-faceted-search";
 import defaultComponentPack from "./components/component-pack";
 import { SolrClient } from "./api/solr-client";
-
+import queryString from 'query-string';
 //import {
 //	SolrFacetedSearch,
 //	SolrClient
@@ -33,21 +33,39 @@ function pivotTypeToFields(fields) {
 const fields = [
 	{label: "All text fields", field: "*", type: "text"},
     {label: "Text", field: "text", type: "text-highlight"},
-	{label: "Archiv", field: "md_akten_bestand_archiv_bezeichnung_txts_s", type: "show"},
-	{label: "Abteilung", field: "md_akten_bestand_abteilung_bezeichnung_txts_s", type: "show"},
-	{label: "Bestand", field: "md_akten_bestand_bezeichnung_txts_s", type: "show"},
-	{label: "Laufzeit Start", field: "md_akten_laufzeit_start_txts_l", type: "range-facet"},
-	{label: "Laufzeit End", field: "md_akten_laufzeit_end_txts_l", type: "range-facet"},
-	{label: "Archiv", field: "md_akten_bestand_archiv_bezeichnung_txts_s,md_akten_bestand_abteilung_bezeichnung_txts_s,md_akten_bestand_bezeichnung_txts_s", type: "pivot-facet"},
-	{label: "Signatur", field: "md_akten_bestand_archiv_signatur_txts_s,md_akten_bestand_abteilung_signatur_txts_s,md_akten_bestand_signatur_txts_s", type: "pivot-facet"},
-	{label: "Path", field: "path_1,path_2,path_3,path_4,path_5,path_6,path_7", type: "pivot-facet"},
-	{label: "Barcode", field: "barcode", type: "text"},
+	{label: "Archiv", field: "md_UF_archiv__txt_s", type: "show"},
+	//{label: "Abteilung", field: "md_akten_bestand_abteilung_bezeichnung_txts_s", type: "show"},
+	{label: "Bestand", field: "md_UF_bestand_txt_s", type: "show"},
+	{label: "Signatur", field: "md_UF_signatur_txt_s", type: "show"},
+	{label: "Alt-Signatur", field: "md_UF_altsignatur_txt_s", type: "show"},
+	{label: "Laufzeit Start", field: "md_UF_laufzeit_von_txt_s_l", type: "range-facet"},
+	{label: "Laufzeit End", field: "md_UF_laufzeit_bis_txt_s_l", type: "range-facet"},
+	{label: "Laufzeit Start", field: "md_UF_laufzeit_von_txt_s_l", type: "show"},
+	{label: "Laufzeit End", field: "md_UF_laufzeit_bis_txt_s_l", type: "show"},
+
+	//{label: "Archiv", field: "md_akten_bestand_archiv_bezeichnung_txts_s,md_akten_bestand_abteilung_bezeichnung_txts_s,md_akten_bestand_bezeichnung_txts_s", type: "pivot-facet"},
+	{label: "Signatur ordered by archive", field: "md_UF_archiv__txt_s,md_UF_bestand_txt_s,md_UF_signatur_txt_s", type: "pivot-facet"},
+	{label: "Titel ordered by archive", field: "md_UF_archiv__txt_s,md_UF_bestand_txt_s,md_UF_titel_txt_s", type: "pivot-facet"},
+	{label: "Alt-Signatur ordered by archive", field: "md_UF_archiv__txt_s,md_UF_altsignatur_txt_s", type: "pivot-facet"},
+	{label: "Titel", field: "md_UF_titel_txt_s", type: "list-facet", collapse: true},
+	{label: "Klassifikation (Archiv-DB)", field: "md_AR_klassifikationRootStored_txt_s,md_AR_klassifikationLeaveStored_txt_s", type: "pivot-facet", collapse : true},
+	//{label: "Klassifikation (Archiv-DB)", field: "md_AR_klassifikationRootStored_txt_s,md_AR_klassifikationLeaveStored_txt_s", type: "pivot-facet", collapse : true},
+	//{label: "Klassifikation (Registratur)", field: "md_AR_klassifikationRootStored_txt_s,md_AR_klassifikationLeaveStored_txt_s", type: "pivot-facet", collapse : true},
+	{label: "Klassifikation", field: "md_UF_klassifikation_serie_txt_s", type: "list-facet", collapse : true},
+	{label: "Klassifikation", field: "md_UF_klassifikation_serie_txt_s", type: "show", collapse : true},
+	{label: "Ort", field: "md_UF_ort_txt_s", type: "list-facet", collapse : true},
+	{label: "Ort", field: "md_UF_ort_txt_s", type: "show"},
+	//{label: "Path", field: "path_1,path_2,path_3,path_4,path_5,path_6,path_7", type: "pivot-facet"},
+	{label: "Barcode", field: "md_UF_barcode_txt", type: "text", collapse : true},
 	{label: "Id", field: "id", type: "text", exact: true},
-	{label: "Akten ID", field: "md_akten_id_is", type: "text",link:"http://gmpg-intern.mpiwg-berlin.mpg.de:8888/admin/Archiv/akte/"},
-	{label: "Url", field: "url", type: "show"},
-	{label: "Type", field: "django_ct", type: "list-facet"},
-
-
+	{label: "Akten ID", field: "md_akten_id_is", type: "text",link:"http://gmpg-intern.mpiwg-berlin.mpg.de:8888/admin/Archiv/akte/" , collapse : true},
+	//{label: "Url", field: "url", type: "show"},
+	{label: "Aktenzeichen", field: "md_UF_aktenzeichen_txt", type: "text", collapse: true},
+	{label: "Type", field: "django_ct", type: "list-facet", collapse: true},
+	{label: "CD Star id", field: "documentIdentifier", type: "text", collapse: true},
+	{label: "Pfad", field: "path_1,path_2,path_3,path_4,path_5,path_6", type: "pivot-facet"},
+	{label: "Pfad", field: "url", type: "show"},
+	//{label: "Ort (only Archiv-DB)", field: "md_AR_bestand_archiv_ort_txt_s", type: "list-facet"},
 	//{label: "Date of birth", field: "birthDate_i", type: "range-facet"},
 	//{label: "Date of death", field: "deathDate_i", type: "range-facet"}
 ];
@@ -63,17 +81,22 @@ document.addEventListener("DOMContentLoaded", () => {
 	// The client class
 
 
+	// params = queryString.parse(this.props.location.search)
+	//alert(params);
 
 	var sc = new SolrClient({
 		// The solr index url to be queried by the client
-		url: "/ds/solr/",
-		//url:"http://localhost:8889/ds/solr/",
+		//url: "/ds/solr/",
+		url:"http://localhost:8889/ds/solr/",
+		last_search_url:"http://localhost:8889/ds",
 		//diva_url: "http://localhost:8889/",
 		diva_url:"/",
 		searchFields: pivotTypeToFields(fields),
 		sortFields: sortFields,
         rows: 10,
-
+		restrictions: "fq=+django_ct:*&fq=-django_ct:documents.pdfsource&fq=-django_ct:djangoZotero*&" +
+        //"fq=+documentIdentifier:*&" +
+        "fq=-django_ct:documents.page&fq=-django_ct:documents.pdfpage",
 		// The change handler passes the current query- and result state for render
 		// as well as the default handlers for interaction with the search component
 		onChange: (state, handlers) =>
@@ -85,12 +108,15 @@ document.addEventListener("DOMContentLoaded", () => {
 					bootstrapCss={true}
 					diva_url = "/"
 					onSelectDoc={(doc) => console.log(doc)}
+					showCsvExport = {true}
 				/>,
 				document.getElementById("app")
 			)
 	});
 
 	//sc.setGroup({"field":"django_ct"});
+
 	sc.initialize(); // this will send an initial search, fetching all results from solr
 	sc.setGroup({"field":"source_i"});
+
 });

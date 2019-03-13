@@ -153,6 +153,7 @@ const solrQuery = (query, format = {wt: "json"}) => {
 			pageStrategy,
 			cursorMark,
 			idField,
+			restrictions,
 			group
 		} = query;
 
@@ -186,7 +187,8 @@ const solrQuery = (query, format = {wt: "json"}) => {
 		`&${cursorMarkParam}` +
 		`&fl=${fields}` +
 		(start === null ? "" : `&start=${start}`) +
-		"&facet=on&hl=on&hl.fl=text&hl.snippets=10&hl.fragsize=300&hl.defaultSummary=true&fq=+django_ct:*&fq=-django_ct:documents.page&fq=-django_ct:documents.pdfpage" +
+		"&facet=on&hl=on&hl.fl=text&hl.snippets=10&hl.fragsize=300&hl.defaultSummary=true&" +
+		`&${restrictions}`+
 		//`&${highlightParam}` +
 		`&${buildFormat(format)}`;
 	console.log("qs",qs);

@@ -28,6 +28,26 @@ server.submitQuery = (query, callback) => {
 	});
 };
 
+server.submitGeneralQuery = (query, callback) => {
+	callback({type: "SET_RESULTS_PENDING"});
+
+	server.performXhr({
+		url: query.url,
+		data: query.data,
+		method: "POST",
+		headers: {
+			"Content-type": "application/x-www-form-urlencoded"
+		}
+	}, (err, resp) => {
+		if (resp.statusCode >= 200 && resp.statusCode < 300) {
+			callback({type: "SET_RESULTS", data: JSON.parse(resp.body)});
+		} else {
+			console.log("Server error: ", resp.statusCode);
+		}
+	});
+};
+
+
 server.fetchCsv = (query, callback) => {
 	server.performXhr({
 		url: query.url,
