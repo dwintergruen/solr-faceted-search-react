@@ -116,7 +116,6 @@ class SolrFacetedSearch extends React.Component {
 						{this.props.showCsvExport
 							? <CsvExportComponent bootstrapCss={bootstrapCss} onClick={onCsvExport} />
 							: null}
-							<LastSearchComponent bootstrapCss={bootstrapCss} onClick={onGetLastSearch} />
 					</ResultHeaderComponent>
 					<CurrentQueryComponent {...this.props} onChange={onSearchFieldChange} />
 					{pagination}

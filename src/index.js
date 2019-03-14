@@ -86,9 +86,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	var sc = new SolrClient({
 		// The solr index url to be queried by the client
-		//url: "/ds/solr/",
-		url:"http://localhost:8889/ds/solr/",
-		last_search_url:"http://localhost:8889/ds",
+		url: "/ds/solr/",
+		//url:"http://localhost:8889/ds/solr/",
+		//last_search_url:"http://localhost:8889/ds",
 		//diva_url: "http://localhost:8889/",
 		diva_url:"/",
 		searchFields: pivotTypeToFields(fields),
