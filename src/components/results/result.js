@@ -50,13 +50,13 @@ class Result extends React.Component {
                             }
 						</li>
 					)}
-					{fields.filter((field) => field.field !== "*" && field.type === "text-highlight").map((field, i) =>
+					{fields.filter((field) => field.field !== "*" && field.type === "text-highlight" && field.value).map((field, i) =>
 						<li key={i}>
-							<label><a href={ diva_url + 'docs/simplePDFSource/' + doc.id + "?search=" + field.value}>{field.label || field.field}</a></label>
+							<label><a href={ diva_url + 'docs/simplePDFSource/' + doc.id + "?search=" + field.value}>{field.label || field.field} mit Suchergebnissen</a></label>
 							<div dangerouslySetInnerHTML={{__html: this.renderHighLightValue(field.field, doc, highlighting)}}/>
 						</li>
 					)}
-					<li  className={cx({"list-group-item": bootstrapCss})}><a href={simple_link}> all </a> | <a href={diva_link}> page by page </a></li>
+					<li  className={cx({"list-group-item": bootstrapCss})}><a href={simple_link}> Scrollbare Ansicht </a> | <a href={diva_link}> Seitenweise und Thumbnail-Ansicht </a></li>
 				</ul>
 			</li>
 			</ul>

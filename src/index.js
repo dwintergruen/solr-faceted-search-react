@@ -31,8 +31,8 @@ function pivotTypeToFields(fields) {
 }
 // The search fields and filterable facets you want
 const fields = [
-	{label: "All text fields", field: "*", type: "text"},
-    {label: "Text", field: "text", type: "text-highlight"},
+	{label: "OCR Text", field: "text", type: "text-highlight"},
+	{label: "Alle Felder", field: "*", type: "text"},
     {label: "Titel", field: "md_UF_titel_txt_s", type: "show", collapse: true},
 	{label: "Archiv", field: "md_UF_archiv__txt_s", type: "show"},
 	//{label: "Abteilung", field: "md_akten_bestand_abteilung_bezeichnung_txts_s", type: "show"},
@@ -45,9 +45,9 @@ const fields = [
 	{label: "Laufzeit End", field: "md_UF_laufzeit_bis_txt", type: "show"},
 
 	//{label: "Archiv", field: "md_akten_bestand_archiv_bezeichnung_txts_s,md_akten_bestand_abteilung_bezeichnung_txts_s,md_akten_bestand_bezeichnung_txts_s", type: "pivot-facet"},
-	{label: "Signatur ordered by archive", field: "md_UF_archiv__txt_s,md_UF_bestand_txt_s,md_UF_signatur_txt_s", type: "pivot-facet"},
-	{label: "Titel ordered by archive", field: "md_UF_archiv__txt_s,md_UF_bestand_txt_s,md_UF_titel_txt_s", type: "pivot-facet"},
-	{label: "Alt-Signatur ordered by archive", field: "md_UF_archiv__txt_s,md_UF_altsignatur_txt_s", type: "pivot-facet"},
+	{label: "Signatur sortiert nach Archiv", field: "md_UF_archiv__txt_s,md_UF_bestand_txt_s,md_UF_signatur_txt_s", type: "pivot-facet"},
+	{label: "Titel sortiert nach Archiv", field: "md_UF_archiv__txt_s,md_UF_bestand_txt_s,md_UF_titel_txt_s", type: "pivot-facet"},
+	{label: "Alt-Signatur sortiert by Archiv", field: "md_UF_archiv__txt_s,md_UF_altsignatur_txt_s", type: "pivot-facet"},
 	{label: "Titel", field: "md_UF_titel_txt_s", type: "list-facet", collapse: true},
 	{label: "Klassifikation (Archiv-DB)", field: "md_AR_klassifikationRootStored_txt_s,md_AR_klassifikationLeaveStored_txt_s", type: "pivot-facet", collapse : true},
 	//{label: "Klassifikation (Archiv-DB)", field: "md_AR_klassifikationRootStored_txt_s,md_AR_klassifikationLeaveStored_txt_s", type: "pivot-facet", collapse : true},
