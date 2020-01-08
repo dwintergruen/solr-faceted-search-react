@@ -58,6 +58,8 @@ class SolrClient {
 		//alert(this.props);
 		//var params = queryString.parse(this.props.location.search)
 		//alert(params);
+
+
 		const { query } = this.state;
 		const { pageStrategy } = query;
 		const payload = {type: "SET_QUERY_FIELDS",

@@ -63,9 +63,11 @@ const fields = [
 	//{label: "Url", field: "url", type: "show"},
 	{label: "Aktenzeichen", field: "md_UF_aktenzeichen_txt", type: "text", collapse: true},
 	{label: "Type", field: "django_ct", type: "list-facet", collapse: true},
+	{label: "Stufe III", field: "stufe_III", type: "list-facet", collapse: true},
 	{label: "CD Star id", field: "documentIdentifier", type: "text", collapse: true},
 	{label: "Pfad", field: "path_1,path_2,path_3,path_4,path_5,path_6", type: "pivot-facet"},
 	{label: "Pfad", field: "url", type: "show"},
+	{label: "Stufe III", field: "stufe_III", type: "show"},
 	{label: "url", field: "url_part1,url_part2,url_part3,url_part4", type: "pivot-facet"},
 	//{label: "Ort (only Archiv-DB)", field: "md_AR_bestand_archiv_ort_txt_s", type: "list-facet"},
 	//{label: "Date of birth", field: "birthDate_i", type: "range-facet"},
@@ -83,8 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	// The client class
 
 
-	// params = queryString.parse(this.props.location.search)
-	//alert(params);
 
 	var sc = new SolrClient({
 		// The solr index url to be queried by the client
@@ -99,7 +99,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		restrictions: "fq=+django_ct:*&fq=-django_ct:documents.pdfsource&fq=-django_ct:djangoZotero*&" +
              "fq=+documentIdentifier:*&" +
             //"fq=+md_UF_archiv__txt_s:*&" +
-        "fq=-django_ct:documents.page&fq=-django_ct:documents.pdfpage",
+        "fq=-django_ct:documents.page&fq=-django_ct:documents.pdfpage&" +
+		"hl.maxAnalyzedChars=1000000&hl.highlightMultiTerm=true",
 		// The change handler passes the current query- and result state for render
 		// as well as the default handlers for interaction with the search component
 		onChange: (state, handlers) =>
@@ -119,7 +120,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	//sc.setGroup({"field":"django_ct"});
 
-	sc.initialize(); // this will send an initial search, fetching all results from solr
-	sc.setGroup({"field":"source_i"});
+
+	let search = queryString.parse(window.location.search);
+	let params = new URLSearchParams(search);
+	let searchString = params.get("search");
+
+	if (searchString) {
+		sc.setSearchFieldValue("*", searchString);
+	} else {
+		sc.initialize(); // this will send an initial search, fetching all results from solr
+	}
+	//sc.setGroup({"field":"source_i"});
 
 });

@@ -38,7 +38,7 @@ class Result extends React.Component {
 			<ul>
 
 
-			<li className={cx({"list-group-item": bootstrapCss})}><img src={thumb_url}/><img src={thumb_url + '?pn=2'}/><img src={thumb_url + '?pn=3'}/></li>
+			<li className={cx({"list-group-item": bootstrapCss})}><img src={thumb_url}/><img src={thumb_url + '?pn=1'}/><img src={thumb_url + '?pn=2'}/></li>
 
 			<li className={cx({"list-group-item": bootstrapCss})} onClick={() => this.props.onSelect(doc)}>
 				<ul>
@@ -52,11 +52,11 @@ class Result extends React.Component {
 					)}
 					{fields.filter((field) => field.field !== "*" && field.type === "text-highlight" && field.value).map((field, i) =>
 						<li key={i}>
-							<label><a href={ diva_url + 'docs/simplePDFSource/' + doc.id + "?search=" + field.value}>{field.label || field.field} mit Suchergebnissen</a></label>
+							<label>Text</label>
 							<div dangerouslySetInnerHTML={{__html: this.renderHighLightValue(field.field, doc, highlighting)}}/>
 						</li>
 					)}
-					<li  className={cx({"list-group-item": bootstrapCss})}><a href={simple_link}> Scrollbare Ansicht </a> | <a href={diva_link}> Seitenweise und Thumbnail-Ansicht </a></li>
+					<li  className={cx({"list-group-item": bootstrapCss})}><a target="_blank" href={simple_link}> Scrollbare Ansicht </a> | <a target="_blank" href={diva_link}> Seitenweise und Thumbnail-Ansicht </a></li>
 				</ul>
 			</li>
 			</ul>

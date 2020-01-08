@@ -49,8 +49,8 @@ class SolrFacetedSearch extends React.Component {
 
 	render() {
 		const { customComponents, bootstrapCss, query, results, truncateFacetListsAt,diva_url} = this.props;
-		const { onSearchFieldChange, onSortFieldChange, onPageChange, onCsvExport, onGetLastSearch } = this.props;
-
+		//const { onSearchFieldChange, onSortFieldChange, onPageChange, onCsvExport, onGetLastSearch } = this.props;
+		const { onSearchFieldChange, onSortFieldChange, onPageChange, onCsvExport } = this.props;
 		const { searchFields, sortFields, start, rows } = query;
 
 		const SearchFieldContainerComponent = customComponents.searchFields.container;
@@ -66,7 +66,7 @@ class SolrFacetedSearch extends React.Component {
 		const GroupPaginateComponent = customComponents.results.grouppaginate;
 		const PreloadComponent = customComponents.results.preloadIndicator;
 		const CsvExportComponent = customComponents.results.csvExport;
-		const LastSearchComponent = customComponents.searches.lastSearch;
+		//const LastSearchComponent = customComponents.searches.lastSearch;
 		const CurrentQueryComponent = customComponents.searchFields.currentQuery;
 		const SortComponent = customComponents.sortFields.menu;
 		const resultPending = results.pending ? (<ResultPendingComponent bootstrapCss={bootstrapCss} />) : null;
@@ -116,7 +116,7 @@ class SolrFacetedSearch extends React.Component {
 						{this.props.showCsvExport
 							? <CsvExportComponent bootstrapCss={bootstrapCss} onClick={onCsvExport} />
 							: null}
-							<LastSearchComponent bootstrapCss={bootstrapCss} onClick={onGetLastSearch} />
+
 					</ResultHeaderComponent>
 					<CurrentQueryComponent {...this.props} onChange={onSearchFieldChange} />
 					{pagination}
@@ -198,3 +198,8 @@ export default SolrFacetedSearch;
 						))}
 					{preloadListItem}
 					</ResultListComponent> */
+
+
+/* removed in return
+<LastSearchComponent bootstrapCss={bootstrapCss} onClick={onGetLastSearch} />
+ */
