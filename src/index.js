@@ -76,7 +76,9 @@ const fields = [
 
 // The sortable fields you want
 const sortFields = [
-	{label: "Aktensignatur", field: "md_akten_aktensignatur_box_txts_s"},
+	{label: "Laufzeit Start", field: "md_UF_laufzeit_von_txt_l"},
+	{label: "Laufzeit End", field: "md_UF_laufzeit_von_txt_l"},
+	{label: "Bestand", field: "md_UF_bestand_txt_s"},
 	//{label: "Date of birth", field: "birthDate_i"},
 	//{label: "Date of death", field: "deathDate_i"}
 ];
@@ -99,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		restrictions: "fq=+django_ct:*&fq=-django_ct:documents.pdfsource&fq=-django_ct:djangoZotero*&" +
              "fq=+documentIdentifier:*&" +
             //"fq=+md_UF_archiv__txt_s:*&" +
-        "fq=-django_ct:documents.page&fq=-django_ct:documents.pdfpage&" +
+        "fq=-django_ct:documents.page&fq=-django_ct:documents.pdfpage&facet.mincount=1&" +
 		"hl.maxAnalyzedChars=1000000&hl.highlightMultiTerm=true",
 		// The change handler passes the current query- and result state for render
 		// as well as the default handlers for interaction with the search component
