@@ -1,0 +1,3 @@
+https://dwinter2:weikiki7@gmpg-intern/ds/solr/gmpg3-dev/select?fq=text:"*lebenslauf* Basedow"~10&q=*:*&hl=on&hl.q=text:"*lebenslauf* Basedow"~10&hl.fl=text&fl=id&snippet=5&hl.fragsize=300
+
+
